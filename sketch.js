@@ -1,18 +1,11 @@
 let sceneLayer, maskLayer;
-let ghost = {
-  x: 640,
-  y: 300,
-  size: 0.5,
-  visible: true,
-  timer: 0,
-  exposure: 0, // accumulated flashlight exposure time
-};
 let lightRadius = 200;
 
 function setup() {
   createCanvas(1280, 720);
   sceneLayer = createGraphics(width, height);
   maskLayer = createGraphics(width, height);
+  ghost = new Ghost(640, 300);
 }
 
 function draw() {
@@ -22,8 +15,9 @@ function draw() {
   drawRoad(sceneLayer);
 
   // === 2. Ghost ===
-  updateGhost();
-  drawGhost(sceneLayer);
+  //updateGhost();
+  ghost.update();
+  ghost.draw(sceneLayer);
 
   // === 3. Flashlight ===
   maskLayer.background(0);
@@ -42,87 +36,6 @@ function draw() {
   blendMode(BLEND);
 }
 
-// === Ghost logic ===
-function updateGhost() {
-  let d = dist(mouseX, mouseY, ghost.x, ghost.y);
-
-  // If touched by flashlight, increase exposure time
-  if (d < lightRadius) {
-    ghost.exposure++;
-  } else {
-    ghost.exposure = max(ghost.exposure - 1, 0);
-  }
-
-  // Disappear after being exposed for more than 1 second (60 frames)
-  if (ghost.exposure > 60 && ghost.visible) {
-    ghost.visible = false; // instant disappearance
-    ghost.timer = 0;
-    ghost.exposure = 0;
-  }
-
-  // Reappear after 2 seconds (120 frames) with a larger size
-  if (!ghost.visible) {
-    ghost.timer++;
-    if (ghost.timer > 120) {
-      ghost.visible = true;
-      ghost.size += 0.15;
-      ghost.x = random(width * 0.3, width * 0.7);
-      ghost.y = random(height * 0.3, height * 0.6);
-    }
-  }
-
-  // Reset if the ghost becomes too large
-  if (ghost.size > 2.5) {
-    ghost.size = 0.5;
-    ghost.y = 300;
-  }
-}
-
-// === Draw ghost ===
-function drawGhost(pg) {
-  if (!ghost.visible) return;
-  pg.push();
-  pg.translate(ghost.x, ghost.y);
-  pg.scale(ghost.size);
-
-  // Head
-  pg.noStroke();
-  pg.fill(255);
-  pg.ellipse(0, 0, 50, 70);
-
-  // Eyes
-  pg.strokeWeight(2);
-  pg.stroke(0);
-  pg.noFill();
-  pg.ellipse(-10, -10, 17, 17);
-  pg.ellipse(10, -10, 17, 17);
-
-  pg.noStroke();
-  pg.fill(0);
-  pg.ellipse(-10, -10, 5, 5);
-  pg.ellipse(10, -10, 5, 5);
-
-  // Mouth
-  pg.strokeWeight(4);
-  pg.stroke(255, 0, 0);
-  pg.noFill();
-  pg.bezier(-20, 10, -10, 30, 10, 30, 20, 10);
-
-  // Body
-  pg.noStroke();
-  pg.fill(255);
-  pg.rect(-15, 35, 30, 120);
-
-  // Legs
-  pg.rect(-10, 155, 5, 100);
-  pg.rect(5, 155, 5, 100);
-
-  // Arms
-  pg.rect(-30, 45, 5, 100);
-  pg.rect(25, 45, 5, 100);
-
-  pg.pop();
-}
 
 // === Road ===
 function drawRoad(pg) {
@@ -136,6 +49,7 @@ function drawRoad(pg) {
   pg.strokeWeight(2);
   pg.line(width / 2, height, width / 2, roadTopY);
 }
+
 
 // === Mountains ===
 function drawMountain(pg) {
