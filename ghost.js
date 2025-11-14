@@ -1,4 +1,6 @@
 let maxversion = 7; // Total number of ghost versions
+let height = 720;
+let roadTopY = height * 0.45;
 
 class Ghost{
     constructor(x, y){
@@ -32,9 +34,9 @@ class Ghost{
             this.timer++;
             if (this.timer > 120) {
                 this.visible = true;
-                this.size = random(0.15, 2.5);
                 this.x = random(width * 0.3, width * 0.7);
-                this.y = random(height * 0.3, height * 0.6);
+                this.y = random(height * 0.45, height * 0.7);
+                this.size = map(this.y, roadTopY, height*0.7, 0.5, 2.5);
                 this.version = ((this.version + 1) % maxversion);
             }
         }
