@@ -17,7 +17,7 @@ function draw() {
   // === 2. Ghost ===
   //updateGhost();
   ghost.update();
-  ghost.draw(sceneLayer);
+  ghost.ghostdraw(sceneLayer);
 
   // === 3. Flashlight ===
   maskLayer.background(0);
